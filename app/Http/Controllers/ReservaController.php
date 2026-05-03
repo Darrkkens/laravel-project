@@ -26,12 +26,39 @@ class ReservaController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
         $clientes = Cliente::orderBy('nome')->get();
         $salas = Sala::where('status', 'disponivel')->orderBy('nome')->get();
+        $salaSelecionadaId = $request->integer('sala_id');
+        $dataReservaSelecionada = $request->input('data_reserva');
+        $horarioInicioSelecionado = $request->input('horario_inicio');
+        $horarioFimSelecionado = $request->input('horario_fim');
 
-        return view('reservas.create', compact('clientes', 'salas'));
+        if (! $salas->contains('id', $salaSelecionadaId)) {
+            $salaSelecionadaId = null;
+        }
+
+        if (! is_string($dataReservaSelecionada) || ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $dataReservaSelecionada)) {
+            $dataReservaSelecionada = null;
+        }
+
+        if (! is_string($horarioInicioSelecionado) || ! preg_match('/^\d{2}:\d{2}$/', $horarioInicioSelecionado)) {
+            $horarioInicioSelecionado = null;
+        }
+
+        if (! is_string($horarioFimSelecionado) || ! preg_match('/^\d{2}:\d{2}$/', $horarioFimSelecionado)) {
+            $horarioFimSelecionado = null;
+        }
+
+        return view('reservas.create', compact(
+            'clientes',
+            'salas',
+            'salaSelecionadaId',
+            'dataReservaSelecionada',
+            'horarioInicioSelecionado',
+            'horarioFimSelecionado'
+        ));
     }
 
     /**

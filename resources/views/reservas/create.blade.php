@@ -30,7 +30,7 @@
                 <select id="sala_id" name="sala_id" class="form-select @error('sala_id') is-invalid @enderror" required>
                     <option value="">Selecione</option>
                     @foreach ($salas as $sala)
-                        <option value="{{ $sala->id }}" @selected((string) old('sala_id') === (string) $sala->id)>
+                        <option value="{{ $sala->id }}" @selected((string) old('sala_id', $salaSelecionadaId ?? '') === (string) $sala->id)>
                             {{ $sala->nome }} (Capacidade: {{ $sala->capacidade }})
                         </option>
                     @endforeach
@@ -43,7 +43,7 @@
             <div class="row">
                 <div class="col-md-4 mb-3">
                     <label for="data_reserva" class="form-label">Data da Reserva</label>
-                    <input type="date" id="data_reserva" name="data_reserva" class="form-control @error('data_reserva') is-invalid @enderror" value="{{ old('data_reserva') }}" required>
+                    <input type="date" id="data_reserva" name="data_reserva" class="form-control @error('data_reserva') is-invalid @enderror" value="{{ old('data_reserva', $dataReservaSelecionada ?? '') }}" required>
                     @error('data_reserva')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -51,7 +51,7 @@
 
                 <div class="col-md-4 mb-3">
                     <label for="horario_inicio" class="form-label">Horário Início</label>
-                    <input type="time" id="horario_inicio" name="horario_inicio" class="form-control @error('horario_inicio') is-invalid @enderror" value="{{ old('horario_inicio') }}" required>
+                    <input type="time" id="horario_inicio" name="horario_inicio" class="form-control @error('horario_inicio') is-invalid @enderror" value="{{ old('horario_inicio', $horarioInicioSelecionado ?? '') }}" required>
                     @error('horario_inicio')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -59,7 +59,7 @@
 
                 <div class="col-md-4 mb-3">
                     <label for="horario_fim" class="form-label">Horário Fim</label>
-                    <input type="time" id="horario_fim" name="horario_fim" class="form-control @error('horario_fim') is-invalid @enderror" value="{{ old('horario_fim') }}" required>
+                    <input type="time" id="horario_fim" name="horario_fim" class="form-control @error('horario_fim') is-invalid @enderror" value="{{ old('horario_fim', $horarioFimSelecionado ?? '') }}" required>
                     @error('horario_fim')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -70,9 +70,9 @@
                 <label for="status" class="form-label">Status</label>
                 <select id="status" name="status" class="form-select @error('status') is-invalid @enderror" required>
                     <option value="">Selecione</option>
-                    <option value="pendente" @selected(old('status') === 'pendente')>Pendente</option>
-                    <option value="confirmada" @selected(old('status') === 'confirmada')>Confirmada</option>
-                    <option value="cancelada" @selected(old('status') === 'cancelada')>Cancelada</option>
+                    <option value="pendente" @selected(old('status', 'pendente') === 'pendente')>Pendente</option>
+                    <option value="confirmada" @selected(old('status', 'pendente') === 'confirmada')>Confirmada</option>
+                    <option value="cancelada" @selected(old('status', 'pendente') === 'cancelada')>Cancelada</option>
                 </select>
                 @error('status')
                     <div class="invalid-feedback">{{ $message }}</div>

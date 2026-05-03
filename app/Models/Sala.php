@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Sala extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'salas';
 
@@ -18,6 +19,16 @@ class Sala extends Model
         'descricao',
         'status',
         'imagem',
+        'responsavel_nome',
+        'responsavel_telefone',
+        'responsavel_email',
+        'cep',
+        'logradouro',
+        'numero',
+        'complemento',
+        'bairro',
+        'cidade',
+        'uf',
     ];
 
     public function reservas(): HasMany

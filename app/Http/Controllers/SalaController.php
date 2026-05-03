@@ -36,8 +36,21 @@ class SalaController extends Controller
             'capacidade' => ['required', 'integer', 'min:1'],
             'descricao' => ['nullable', 'string'],
             'status' => ['required', 'in:disponivel,indisponivel,manutencao'],
+            'responsavel_nome' => ['required', 'string', 'max:255'],
+            'responsavel_telefone' => ['required', 'string', 'max:20'],
+            'responsavel_email' => ['required', 'email', 'max:255'],
+            'cep' => ['required', 'regex:/^\d{5}-?\d{3}$/'],
+            'logradouro' => ['required', 'string', 'max:255'],
+            'numero' => ['required', 'string', 'max:20'],
+            'complemento' => ['nullable', 'string', 'max:255'],
+            'bairro' => ['required', 'string', 'max:255'],
+            'cidade' => ['required', 'string', 'max:255'],
+            'uf' => ['required', 'string', 'size:2'],
             'imagem' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
+
+        $validated['cep'] = $this->normalizeCep($validated['cep']);
+        $validated['uf'] = strtoupper($validated['uf']);
 
         if ($request->hasFile('imagem')) {
             $validated['imagem'] = $request->file('imagem')->store('salas', 'public');
@@ -74,8 +87,21 @@ class SalaController extends Controller
             'capacidade' => ['required', 'integer', 'min:1'],
             'descricao' => ['nullable', 'string'],
             'status' => ['required', 'in:disponivel,indisponivel,manutencao'],
+            'responsavel_nome' => ['required', 'string', 'max:255'],
+            'responsavel_telefone' => ['required', 'string', 'max:20'],
+            'responsavel_email' => ['required', 'email', 'max:255'],
+            'cep' => ['required', 'regex:/^\d{5}-?\d{3}$/'],
+            'logradouro' => ['required', 'string', 'max:255'],
+            'numero' => ['required', 'string', 'max:20'],
+            'complemento' => ['nullable', 'string', 'max:255'],
+            'bairro' => ['required', 'string', 'max:255'],
+            'cidade' => ['required', 'string', 'max:255'],
+            'uf' => ['required', 'string', 'size:2'],
             'imagem' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
+
+        $validated['cep'] = $this->normalizeCep($validated['cep']);
+        $validated['uf'] = strtoupper($validated['uf']);
 
         if ($request->hasFile('imagem')) {
             if ($sala->imagem) {
@@ -103,12 +129,19 @@ class SalaController extends Controller
                 ->with('success', 'Sala não pode ser excluída porque possui reservas vinculadas.');
         }
 
-        if ($sala->imagem) {
-            Storage::disk('public')->delete($sala->imagem);
-        }
-
         $sala->delete();
 
         return redirect()->route('salas.index')->with('success', 'Sala excluída com sucesso.');
+    }
+
+    private function normalizeCep(string $cep): string
+    {
+        $digits = preg_replace('/\D/', '', $cep) ?? '';
+
+        if (strlen($digits) === 8) {
+            return substr($digits, 0, 5) . '-' . substr($digits, 5, 3);
+        }
+
+        return $cep;
     }
 }
