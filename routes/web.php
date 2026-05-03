@@ -13,6 +13,7 @@ Route::get('/', function () {
         'totalClientes' => Cliente::count(),
         'totalSalas' => Sala::count(),
         'totalReservas' => Reserva::count(),
+        'salas' => Sala::orderBy('nome')->get(),
     ]);
 })->name('dashboard');
 

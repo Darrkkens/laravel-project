@@ -33,6 +33,33 @@
 
             <dt class="col-sm-3">Descrição</dt>
             <dd class="col-sm-9">{{ $sala->descricao ?: '-' }}</dd>
+
+            <dt class="col-sm-3">Responsável</dt>
+            <dd class="col-sm-9">{{ $sala->responsavel_nome ?: '-' }}</dd>
+
+            <dt class="col-sm-3">Telefone Contato</dt>
+            <dd class="col-sm-9">{{ $sala->responsavel_telefone ?: '-' }}</dd>
+
+            <dt class="col-sm-3">E-mail Contato</dt>
+            <dd class="col-sm-9">{{ $sala->responsavel_email ?: '-' }}</dd>
+
+            <dt class="col-sm-3">CEP</dt>
+            <dd class="col-sm-9">{{ $sala->cep ?: '-' }}</dd>
+
+            <dt class="col-sm-3">Logradouro</dt>
+            <dd class="col-sm-9">{{ $sala->logradouro ?: '-' }}</dd>
+
+            <dt class="col-sm-3">Número</dt>
+            <dd class="col-sm-9">{{ $sala->numero ?: '-' }}</dd>
+
+            <dt class="col-sm-3">Complemento</dt>
+            <dd class="col-sm-9">{{ $sala->complemento ?: '-' }}</dd>
+
+            <dt class="col-sm-3">Bairro</dt>
+            <dd class="col-sm-9">{{ $sala->bairro ?: '-' }}</dd>
+
+            <dt class="col-sm-3">Cidade/UF</dt>
+            <dd class="col-sm-9">{{ $sala->cidade ?: '-' }}/{{ strtoupper($sala->uf ?: '-') }}</dd>
         </dl>
     </div>
 </div>
