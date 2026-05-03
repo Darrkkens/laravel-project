@@ -70,7 +70,6 @@
                 <label for="cep" class="form-label">CEP</label>
                 <div class="input-group">
                     <input type="text" id="cep" name="cep" class="form-control @error('cep') is-invalid @enderror" value="{{ old('cep', $sala->cep) }}" maxlength="9" required>
-                    <button class="btn btn-outline-secondary" type="button" id="buscarCepBtn">Buscar CEP</button>
                     @error('cep')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -174,6 +173,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const complementoInput = document.getElementById('complemento');
     const bairroInput = document.getElementById('bairro');
     const cidadeInput = document.getElementById('cidade');
+    let cepSearchTimer = null;
+    let lastFetchedCep = '';
 
     function formatCep(value) {
         const digits = value.replace(/\D/g, '').slice(0, 8);
@@ -194,13 +195,22 @@ document.addEventListener('DOMContentLoaded', function () {
             .replace(/(\d{5})(\d)/, '$1-$2');
     }
 
-    async function buscarCep() {
+    async function buscarCep(force = false) {
         const cepDigits = cepInput.value.replace(/\D/g, '');
         cepFeedback.textContent = '';
 
         if (cepDigits.length !== 8) {
-            cepFeedback.textContent = 'Informe um CEP válido com 8 dígitos.';
-            cepFeedback.className = 'form-text text-danger';
+            if (cepDigits.length > 0) {
+                cepFeedback.textContent = 'Informe um CEP válido com 8 dígitos.';
+                cepFeedback.className = 'form-text text-danger';
+            } else {
+                cepFeedback.className = 'form-text text-muted';
+            }
+            lastFetchedCep = '';
+            return;
+        }
+
+        if (!force && cepDigits === lastFetchedCep) {
             return;
         }
 
@@ -214,6 +224,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (data.erro) {
                 cepFeedback.textContent = 'CEP não encontrado.';
                 cepFeedback.className = 'form-text text-danger';
+                lastFetchedCep = '';
                 return;
             }
 
@@ -222,17 +233,23 @@ document.addEventListener('DOMContentLoaded', function () {
             bairroInput.value = data.bairro || '';
             cidadeInput.value = data.localidade || '';
             ufInput.value = (data.uf || '').toUpperCase();
+            lastFetchedCep = cepDigits;
 
             cepFeedback.textContent = 'Endereço preenchido com sucesso.';
             cepFeedback.className = 'form-text text-success';
         } catch (error) {
             cepFeedback.textContent = 'Não foi possível consultar o CEP agora.';
             cepFeedback.className = 'form-text text-danger';
+            lastFetchedCep = '';
         }
     }
 
     cepInput.addEventListener('input', function () {
         cepInput.value = formatCep(cepInput.value);
+        clearTimeout(cepSearchTimer);
+        cepSearchTimer = setTimeout(function () {
+            buscarCep(false);
+        }, 350);
     });
 
     telefoneInput.addEventListener('input', function () {
@@ -243,12 +260,18 @@ document.addEventListener('DOMContentLoaded', function () {
         ufInput.value = ufInput.value.toUpperCase().slice(0, 2);
     });
 
-    cepInput.addEventListener('blur', buscarCep);
-    buscarCepBtn.addEventListener('click', buscarCep);
+    cepInput.addEventListener('blur', function () {
+        buscarCep(true);
+    });
+
+    buscarCepBtn.addEventListener('click', function () {
+        buscarCep(true);
+    });
 
     cepInput.value = formatCep(cepInput.value);
     telefoneInput.value = formatTelefone(telefoneInput.value);
     ufInput.value = ufInput.value.toUpperCase().slice(0, 2);
+    buscarCep(false);
 });
 </script>
 @endsection
