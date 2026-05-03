@@ -33,10 +33,19 @@
     <a href="{{ route('reservas.create') }}" class="btn btn-primary">Nova Reserva</a>
 </div>
 
+<form method="GET" action="{{ route('reservas.index') }}" class="mb-3" id="reservasSearchForm">
+    <div class="row g-2 align-items-end">
+        <div class="col-12">
+            <label for="q" class="form-label mb-1">Encontre rapidamente</label>
+            <input type="text" id="q" name="q" class="form-control" value="{{ $q ?? '' }}" placeholder="Digite cliente, sala, status, data ou horário">
+        </div>
+    </div>
+</form>
+
 @if ($reservas->isEmpty())
     <div class="card mb-4">
         <div class="card-body">
-            <p class="text-muted mb-0">Nenhuma reserva cadastrada.</p>
+            <p class="text-muted mb-0">Nenhuma reserva encontrada.</p>
         </div>
     </div>
 @else
@@ -64,7 +73,7 @@
                     </thead>
                     <tbody>
                         @foreach ($reservas as $reserva)
-                            <tr>
+                            <tr data-reserva-item>
                                 <td>{{ $reserva->cliente?->nome ?: '-' }}</td>
                                 <td>{{ $reserva->sala?->nome ?: '-' }}</td>
                                 <td>{{ \Carbon\Carbon::parse($reserva->data_reserva)->format('d/m/Y') }}</td>
@@ -85,6 +94,7 @@
                     </tbody>
                 </table>
             </div>
+            <p id="reservasNoResults" class="text-muted mb-0 d-none">Nenhuma reserva encontrada para a busca.</p>
         </div>
     </div>
 @endif
@@ -93,14 +103,86 @@
 <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.20/locales/pt-br.global.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    const searchForm = document.getElementById('reservasSearchForm');
+    const searchInput = document.getElementById('q');
+    const tableItems = Array.from(document.querySelectorAll('[data-reserva-item]'));
+    const noResults = document.getElementById('reservasNoResults');
     const calendarElement = document.getElementById('reservasCalendar');
     const reservaCreateBaseUrl = @json(route('reservas.create'));
 
-    if (!calendarElement) {
-        return;
+    const normalize = (value) =>
+        (value || '')
+            .toString()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase();
+
+    let calendar = null;
+    const allEvents = @json($calendarEvents);
+
+    const applyFilter = () => {
+        const term = normalize(searchInput?.value || '');
+        let visible = 0;
+
+        tableItems.forEach((item) => {
+            const text = normalize(item.innerText);
+            const match = term === '' || text.includes(term);
+
+            item.classList.toggle('d-none', !match);
+            if (match) {
+                visible += 1;
+            }
+        });
+
+        if (noResults) {
+            noResults.classList.toggle('d-none', visible > 0 || tableItems.length === 0);
+        }
+
+        if (calendar) {
+            const filteredEvents = allEvents.filter((event) => {
+                if (term === '') {
+                    return true;
+                }
+
+                const blob = normalize([
+                    event.title,
+                    event.extendedProps?.status,
+                    event.extendedProps?.sala,
+                    event.extendedProps?.cliente,
+                    event.start,
+                    event.end,
+                ].join(' '));
+
+                return blob.includes(term);
+            });
+
+            calendar.removeAllEvents();
+            calendar.addEventSource(filteredEvents);
+        }
+    };
+
+    if (searchForm) {
+        searchForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+        });
     }
 
-    const events = @json($calendarEvents);
+    if (searchInput) {
+        let searchTimer = null;
+
+        searchInput.addEventListener('input', function () {
+            clearTimeout(searchTimer);
+
+            searchTimer = setTimeout(function () {
+                applyFilter();
+            }, 250);
+        });
+    }
+
+    if (!calendarElement) {
+        applyFilter();
+        return;
+    }
 
     function formatDate(date) {
         return date.toISOString().slice(0, 10);
@@ -115,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function () {
         window.location.href = reservaCreateBaseUrl + '?' + query.toString();
     }
 
-    const calendar = new FullCalendar.Calendar(calendarElement, {
+    calendar = new FullCalendar.Calendar(calendarElement, {
         locale: 'pt-br',
         initialView: 'dayGridMonth',
         height: 'auto',
@@ -132,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function () {
             week: 'Semana',
             day: 'Dia',
         },
-        events: events,
+        events: allEvents,
         eventDidMount: function (info) {
             const status = info.event.extendedProps.status || '';
             info.el.title = 'Status: ' + status;
@@ -159,6 +241,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     calendar.render();
+    applyFilter();
 });
 </script>
 @endsection

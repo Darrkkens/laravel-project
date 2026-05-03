@@ -11,11 +11,23 @@ class ClienteController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $clientes = Cliente::orderBy('nome')->get();
+        $q = trim((string) $request->input('q', ''));
 
-        return view('clientes.index', compact('clientes'));
+        $clientes = Cliente::query()
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($searchQuery) use ($q) {
+                    $searchQuery->where('nome', 'like', "%{$q}%")
+                        ->orWhere('documento', 'like', "%{$q}%")
+                        ->orWhere('telefone', 'like', "%{$q}%")
+                        ->orWhere('email', 'like', "%{$q}%");
+                });
+            })
+            ->orderBy('nome')
+            ->get();
+
+        return view('clientes.index', compact('clientes', 'q'));
     }
 
     /**

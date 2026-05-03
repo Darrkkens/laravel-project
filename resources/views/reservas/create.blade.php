@@ -67,16 +67,9 @@
             </div>
 
             <div class="mb-3">
-                <label for="status" class="form-label">Status</label>
-                <select id="status" name="status" class="form-select @error('status') is-invalid @enderror" required>
-                    <option value="">Selecione</option>
-                    <option value="pendente" @selected(old('status', 'pendente') === 'pendente')>Pendente</option>
-                    <option value="confirmada" @selected(old('status', 'pendente') === 'confirmada')>Confirmada</option>
-                    <option value="cancelada" @selected(old('status', 'pendente') === 'cancelada')>Cancelada</option>
-                </select>
-                @error('status')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+                <label class="form-label">Status</label>
+                <input type="text" class="form-control" value="Pendente (definido automaticamente)" readonly>
+                <small class="text-muted">A confirmação é feita manualmente na edição da reserva.</small>
             </div>
 
             <div class="d-flex gap-2">
