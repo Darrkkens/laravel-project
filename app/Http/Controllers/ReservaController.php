@@ -13,14 +13,31 @@ class ReservaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $q = trim((string) $request->input('q', ''));
+
         $reservas = Reserva::with(['cliente', 'sala'])
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($searchQuery) use ($q) {
+                    $searchQuery->where('status', 'like', "%{$q}%")
+                        ->orWhere('data_reserva', 'like', "%{$q}%")
+                        ->orWhere('horario_inicio', 'like', "%{$q}%")
+                        ->orWhere('horario_fim', 'like', "%{$q}%")
+                        ->orWhereHas('cliente', function ($clienteQuery) use ($q) {
+                            $clienteQuery->where('nome', 'like', "%{$q}%")
+                                ->orWhere('documento', 'like', "%{$q}%");
+                        })
+                        ->orWhereHas('sala', function ($salaQuery) use ($q) {
+                            $salaQuery->where('nome', 'like', "%{$q}%");
+                        });
+                });
+            })
             ->orderBy('data_reserva')
             ->orderBy('horario_inicio')
             ->get();
 
-        return view('reservas.index', compact('reservas'));
+        return view('reservas.index', compact('reservas', 'q'));
     }
 
     /**
@@ -72,8 +89,9 @@ class ReservaController extends Controller
             'data_reserva' => ['required', 'date'],
             'horario_inicio' => ['required', 'date_format:H:i'],
             'horario_fim' => ['required', 'date_format:H:i', 'after:horario_inicio'],
-            'status' => ['required', 'in:pendente,confirmada,cancelada'],
         ]);
+
+        $validated['status'] = 'pendente';
 
         $businessRuleError = $this->validateBusinessRules($validated);
         if ($businessRuleError !== null) {

@@ -8,13 +8,22 @@
     <a href="{{ route('salas.create') }}" class="btn btn-primary">Nova Sala</a>
 </div>
 
+<form method="GET" action="{{ route('salas.index') }}" class="mb-3" id="salasSearchForm">
+    <div class="row g-2 align-items-end">
+        <div class="col-12">
+            <label for="q" class="form-label mb-1">Encontre rapidamente</label>
+            <input type="text" id="q" name="q" class="form-control" value="{{ $q ?? '' }}" placeholder="Digite nome, responsável, contato ou localização">
+        </div>
+    </div>
+</form>
+
 
 @if ($salas->isEmpty())
-    <div class="alert alert-info mb-0">Nenhuma sala cadastrada.</div>
+    <div class="alert alert-info mb-0">Nenhuma sala encontrada.</div>
 @else
     <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
         @foreach ($salas as $sala)
-            <div class="col">
+            <div class="col" data-sala-item>
                 <div class="card h-100 shadow-sm">
                     @if ($sala->imagem)
                         <img src="{{ asset('storage/' . $sala->imagem) }}" alt="Imagem da sala {{ $sala->nome }}" class="card-img-top" style="height: 220px; object-fit: cover;">
@@ -65,5 +74,61 @@
             </div>
         @endforeach
     </div>
+    <div id="salasNoResults" class="alert alert-info mt-3 d-none">Nenhuma sala encontrada para a busca.</div>
 @endif
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('salasSearchForm');
+    const input = document.getElementById('q');
+    const items = Array.from(document.querySelectorAll('[data-sala-item]'));
+    const noResults = document.getElementById('salasNoResults');
+
+    if (!form || !input) {
+        return;
+    }
+
+    const normalize = (value) =>
+        (value || '')
+            .toString()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase();
+
+    const applyFilter = () => {
+        const term = normalize(input.value);
+        let visible = 0;
+
+        items.forEach((item) => {
+            const text = normalize(item.innerText);
+            const match = term === '' || text.includes(term);
+
+            item.classList.toggle('d-none', !match);
+            if (match) {
+                visible += 1;
+            }
+        });
+
+        if (noResults) {
+            noResults.classList.toggle('d-none', visible > 0 || items.length === 0);
+        }
+    };
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+    });
+
+    let timer = null;
+
+    input.addEventListener('input', function () {
+        clearTimeout(timer);
+
+        timer = setTimeout(function () {
+            applyFilter();
+        }, 250);
+    });
+
+    applyFilter();
+});
+</script>
 @endsection

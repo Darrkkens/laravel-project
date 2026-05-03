@@ -11,11 +11,36 @@ class SalaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $salas = Sala::orderBy('nome')->get();
+        $q = trim((string) $request->input('q', ''));
 
-        return view('salas.index', compact('salas'));
+        $salas = Sala::query()
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($searchQuery) use ($q) {
+                    $searchQuery->where('nome', 'like', "%{$q}%")
+                        ->orWhere('descricao', 'like', "%{$q}%")
+                        ->orWhere('status', 'like', "%{$q}%")
+                        ->orWhere('responsavel_nome', 'like', "%{$q}%")
+                        ->orWhere('responsavel_telefone', 'like', "%{$q}%")
+                        ->orWhere('responsavel_email', 'like', "%{$q}%")
+                        ->orWhere('cep', 'like', "%{$q}%")
+                        ->orWhere('logradouro', 'like', "%{$q}%")
+                        ->orWhere('numero', 'like', "%{$q}%")
+                        ->orWhere('complemento', 'like', "%{$q}%")
+                        ->orWhere('bairro', 'like', "%{$q}%")
+                        ->orWhere('cidade', 'like', "%{$q}%")
+                        ->orWhere('uf', 'like', "%{$q}%");
+
+                    if (is_numeric($q)) {
+                        $searchQuery->orWhere('capacidade', (int) $q);
+                    }
+                });
+            })
+            ->orderBy('nome')
+            ->get();
+
+        return view('salas.index', compact('salas', 'q'));
     }
 
     /**

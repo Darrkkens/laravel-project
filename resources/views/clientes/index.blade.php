@@ -8,10 +8,19 @@
     <a href="{{ route('clientes.create') }}" class="btn btn-primary">Novo Cliente</a>
 </div>
 
+<form method="GET" action="{{ route('clientes.index') }}" class="mb-3" id="clientesSearchForm">
+    <div class="row g-2 align-items-end">
+        <div class="col-12">
+            <label for="q" class="form-label mb-1">Encontre rapidamente</label>
+            <input type="text" id="q" name="q" class="form-control" value="{{ $q ?? '' }}" placeholder="Digite nome, documento, telefone ou e-mail">
+        </div>
+    </div>
+</form>
+
 <div class="card">
     <div class="card-body">
         @if ($clientes->isEmpty())
-            <p class="text-muted mb-0">Nenhum cliente cadastrado.</p>
+            <p class="text-muted mb-0">Nenhum cliente encontrado.</p>
         @else
             <div class="table-responsive">
                 <table class="table table-striped align-middle">
@@ -26,7 +35,7 @@
                     </thead>
                     <tbody>
                         @foreach ($clientes as $cliente)
-                            <tr>
+                            <tr data-cliente-item>
                                 <td>{{ $cliente->nome }}</td>
                                 <td>{{ $cliente->documento }}</td>
                                 <td>{{ $cliente->telefone ?: '-' }}</td>
@@ -45,7 +54,63 @@
                     </tbody>
                 </table>
             </div>
+            <p id="clientesNoResults" class="text-muted mb-0 d-none">Nenhum cliente encontrado para a busca.</p>
         @endif
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('clientesSearchForm');
+    const input = document.getElementById('q');
+    const items = Array.from(document.querySelectorAll('[data-cliente-item]'));
+    const noResults = document.getElementById('clientesNoResults');
+
+    if (!form || !input) {
+        return;
+    }
+
+    const normalize = (value) =>
+        (value || '')
+            .toString()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase();
+
+    const applyFilter = () => {
+        const term = normalize(input.value);
+        let visible = 0;
+
+        items.forEach((item) => {
+            const text = normalize(item.innerText);
+            const match = term === '' || text.includes(term);
+
+            item.classList.toggle('d-none', !match);
+            if (match) {
+                visible += 1;
+            }
+        });
+
+        if (noResults) {
+            noResults.classList.toggle('d-none', visible > 0 || items.length === 0);
+        }
+    };
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+    });
+
+    let timer = null;
+
+    input.addEventListener('input', function () {
+        clearTimeout(timer);
+
+        timer = setTimeout(function () {
+            applyFilter();
+        }, 250);
+    });
+
+    applyFilter();
+});
+</script>
 @endsection
