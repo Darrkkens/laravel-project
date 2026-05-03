@@ -16,6 +16,17 @@
             border-color: #0d6efd;
             box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
         }
+
+        .required-label::after {
+            content: " *";
+            color: #dc3545;
+            font-weight: 700;
+        }
+
+        .required-empty {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.15rem rgba(220, 53, 69, 0.18) !important;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -66,5 +77,46 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const requiredFields = Array.from(document.querySelectorAll('input[required], select[required], textarea[required]'))
+        .filter((field) => field.type !== 'hidden' && !field.disabled);
+
+    const isFieldEmpty = (field) => {
+        if (field.type === 'checkbox' || field.type === 'radio') {
+            return !field.checked;
+        }
+
+        return String(field.value || '').trim() === '';
+    };
+
+    const updateFieldState = (field) => {
+        const empty = isFieldEmpty(field);
+        field.classList.toggle('required-empty', empty);
+        field.setAttribute('aria-invalid', empty ? 'true' : 'false');
+    };
+
+    requiredFields.forEach((field) => {
+        const label = field.id ? document.querySelector('label[for="' + field.id + '"]') : null;
+        if (label) {
+            label.classList.add('required-label');
+        }
+
+        field.addEventListener('input', () => updateFieldState(field));
+        field.addEventListener('change', () => updateFieldState(field));
+        field.addEventListener('blur', () => updateFieldState(field));
+    });
+
+    document.querySelectorAll('form').forEach((form) => {
+        form.addEventListener('submit', () => {
+            requiredFields.forEach((field) => {
+                if (form.contains(field)) {
+                    updateFieldState(field);
+                }
+            });
+        });
+    });
+});
+</script>
 </body>
 </html>
