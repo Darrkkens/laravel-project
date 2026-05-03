@@ -59,6 +59,15 @@ docker compose exec app php artisan storage:link
 http://localhost:8080
 ```
 
+## Relacionamentos
+
+- `Cliente` 1:N `Reserva`
+  - Um cliente pode possuir varias reservas.
+  - Uma reserva pertence a um cliente.
+- `Sala` 1:N `Reserva`
+  - Uma sala pode possuir varias reservas.
+  - Uma reserva pertence a uma sala.
+
 ## Regras de Negocio
 
 ### Clientes
