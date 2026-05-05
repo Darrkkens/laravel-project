@@ -68,6 +68,8 @@ http://localhost:8080
   - Uma sala pode possuir varias reservas.
   - Uma reserva pertence a uma sala.
 
+![MER](storage/images/mer.png)
+
 ## Regras de Negocio
 
 ### Clientes
@@ -90,6 +92,8 @@ http://localhost:8080
   - bloqueada se houver reservas vinculadas
   - exclusao logica (soft delete)
 
+![Salas](storage/images/salas.png)
+
 ### Reservas
 
 - Campos principais: `cliente_id`, `sala_id`, `data_reserva`, `horario_inicio`, `horario_fim`, `status`.
@@ -99,6 +103,9 @@ http://localhost:8080
 - Validacoes:
   - `horario_fim` deve ser maior que `horario_inicio`
   - cliente e sala devem existir
+
+![Reservas](storage/images/reservas.png)
+
 
 ### Regras de Reserva
 
@@ -128,3 +135,4 @@ http://localhost:8080
   - CPF/CNPJ e telefone em clientes
   - telefone e CEP em salas
 - Integracao ViaCEP para preenchimento automatico de endereco nas salas.
+
