@@ -50,7 +50,19 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('reservas.*') ? 'active' : '' }}" href="{{ route('reservas.index') }}">Reservas</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}">Usuários</a>
+                </li>
             </ul>
+            @auth
+                <div class="d-flex align-items-center ms-lg-3 mt-2 mt-lg-0">
+                    <span class="navbar-text me-3">{{ auth()->user()->name }}</span>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-light btn-sm">Sair</button>
+                    </form>
+                </div>
+            @endauth
         </div>
     </div>
 </nav>

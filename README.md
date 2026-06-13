@@ -47,16 +47,29 @@ docker compose exec app php artisan key:generate
 docker compose exec app php artisan migrate
 ```
 
-### 7. Criar link do storage publico
+### 7. Criar usuario padrao (admin)
+
+```bash
+docker compose exec app php artisan db:seed
+```
+
+### 8. Criar link do storage publico
 
 ```bash
 docker compose exec app php artisan storage:link
 ```
 
-### 8. Acessar no navegador
+### 9. Acessar no navegador
 
 ```text
 http://localhost:8080
+```
+
+Credenciais padrao da primeira instalacao:
+
+```text
+E-mail: admin@salas.com
+Senha: 123456
 ```
 
 ## Relacionamentos
