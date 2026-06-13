@@ -82,12 +82,14 @@
                                 <td>{{ ucfirst($reserva->status) }}</td>
                                 <td class="text-end">
                                     <a href="{{ route('reservas.show', $reserva) }}" class="btn btn-sm btn-outline-info">Ver</a>
-                                    <a href="{{ route('reservas.edit', $reserva) }}" class="btn btn-sm btn-outline-secondary">Editar</a>
-                                    <form action="{{ route('reservas.destroy', $reserva) }}" method="POST" class="d-inline" onsubmit="return confirm('Deseja excluir esta reserva?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">Excluir</button>
-                                    </form>
+                                    @if (auth()->user()?->isAdmin())
+                                        <a href="{{ route('reservas.edit', $reserva) }}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                                        <form action="{{ route('reservas.destroy', $reserva) }}" method="POST" class="d-inline" onsubmit="return confirm('Deseja excluir esta reserva?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Excluir</button>
+                                        </form>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

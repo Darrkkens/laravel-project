@@ -32,6 +32,11 @@ class User extends Authenticatable
      */
     public const PERFIS = ['admin', 'usuario'];
 
+    public function isAdmin(): bool
+    {
+        return $this->perfil === 'admin';
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *

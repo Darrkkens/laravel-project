@@ -27,13 +27,23 @@ Route::middleware('auth')->group(function () {
         ]);
     })->name('dashboard');
 
-    Route::patch('usuarios/{user}/toggle', [UserController::class, 'toggle'])->name('users.toggle');
-    Route::resource('usuarios', UserController::class)
-        ->parameters(['usuarios' => 'user'])
-        ->names('users')
-        ->except('show');
+    Route::resource('clientes', ClienteController::class)->only(['index']);
+    Route::resource('salas', SalaController::class)->only(['index']);
 
-    Route::resource('clientes', ClienteController::class);
-    Route::resource('salas', SalaController::class);
-    Route::resource('reservas', ReservaController::class);
+    Route::resource('reservas', ReservaController::class)->only(['index', 'create', 'store', 'show']);
+
+    Route::middleware('admin')->group(function () {
+        Route::patch('usuarios/{user}/toggle', [UserController::class, 'toggle'])->name('users.toggle');
+        Route::resource('usuarios', UserController::class)
+            ->parameters(['usuarios' => 'user'])
+            ->names('users')
+            ->except('show');
+
+        Route::resource('clientes', ClienteController::class)->except(['index', 'show']);
+        Route::resource('salas', SalaController::class)->except(['index', 'show']);
+        Route::resource('reservas', ReservaController::class)->only(['edit', 'update', 'destroy']);
+    });
+
+    Route::resource('clientes', ClienteController::class)->only(['show']);
+    Route::resource('salas', SalaController::class)->only(['show']);
 });

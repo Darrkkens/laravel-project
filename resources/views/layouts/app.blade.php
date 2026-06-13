@@ -41,18 +41,22 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">Dashboard</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('clientes.*') ? 'active' : '' }}" href="{{ route('clientes.index') }}">Clientes</a>
-                </li>
+                @if (auth()->user()?->isAdmin())
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('clientes.*') ? 'active' : '' }}" href="{{ route('clientes.index') }}">Clientes</a>
+                    </li>
+                @endif
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('salas.*') ? 'active' : '' }}" href="{{ route('salas.index') }}">Salas</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('reservas.*') ? 'active' : '' }}" href="{{ route('reservas.index') }}">Reservas</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}">Usuários</a>
-                </li>
+                @if (auth()->user()?->isAdmin())
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}">Usuários</a>
+                    </li>
+                @endif
             </ul>
             @auth
                 <div class="d-flex align-items-center ms-lg-3 mt-2 mt-lg-0">

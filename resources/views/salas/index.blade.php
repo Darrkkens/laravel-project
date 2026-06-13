@@ -5,7 +5,9 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h3 mb-0">Salas</h1>
-    <a href="{{ route('salas.create') }}" class="btn btn-primary">Nova Sala</a>
+    @if (auth()->user()?->isAdmin())
+        <a href="{{ route('salas.create') }}" class="btn btn-primary">Nova Sala</a>
+    @endif
 </div>
 
 <form method="GET" action="{{ route('salas.index') }}" class="mb-3" id="salasSearchForm">
@@ -62,12 +64,14 @@
 
                         <div class="d-flex gap-2 mt-3">
                             <a href="{{ route('salas.show', $sala) }}" class="btn btn-outline-info btn-sm">Ver</a>
-                            <a href="{{ route('salas.edit', $sala) }}" class="btn btn-outline-secondary btn-sm">Editar</a>
-                            <form action="{{ route('salas.destroy', $sala) }}" method="POST" onsubmit="return confirm('Deseja excluir esta sala?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-outline-danger btn-sm">Excluir</button>
-                            </form>
+                            @if (auth()->user()?->isAdmin())
+                                <a href="{{ route('salas.edit', $sala) }}" class="btn btn-outline-secondary btn-sm">Editar</a>
+                                <form action="{{ route('salas.destroy', $sala) }}" method="POST" onsubmit="return confirm('Deseja excluir esta sala?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">Excluir</button>
+                                </form>
+                            @endif
                         </div>
                     </div>
                 </div>

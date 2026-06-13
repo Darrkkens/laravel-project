@@ -129,6 +129,10 @@ class ReservaController extends Controller
      */
     public function update(Request $request, Reserva $reserva)
     {
+        if (! $request->user()?->isAdmin() && $request->input('status') !== $reserva->status) {
+            abort(403, 'Apenas administradores podem alterar o status da reserva.');
+        }
+
         $validated = $request->validate([
             'cliente_id' => ['required', 'exists:clientes,id'],
             'sala_id' => ['required', 'exists:salas,id'],

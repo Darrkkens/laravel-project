@@ -5,7 +5,9 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h3 mb-0">Clientes</h1>
-    <a href="{{ route('clientes.create') }}" class="btn btn-primary">Novo Cliente</a>
+    @if (auth()->user()?->isAdmin())
+        <a href="{{ route('clientes.create') }}" class="btn btn-primary">Novo Cliente</a>
+    @endif
 </div>
 
 <form method="GET" action="{{ route('clientes.index') }}" class="mb-3" id="clientesSearchForm">
@@ -42,12 +44,14 @@
                                 <td>{{ $cliente->email ?: '-' }}</td>
                                 <td class="text-end">
                                     <a href="{{ route('clientes.show', $cliente) }}" class="btn btn-sm btn-outline-info">Ver</a>
-                                    <a href="{{ route('clientes.edit', $cliente) }}" class="btn btn-sm btn-outline-secondary">Editar</a>
-                                    <form action="{{ route('clientes.destroy', $cliente) }}" method="POST" class="d-inline" onsubmit="return confirm('Deseja excluir este cliente?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">Excluir</button>
-                                    </form>
+                                    @if (auth()->user()?->isAdmin())
+                                        <a href="{{ route('clientes.edit', $cliente) }}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                                        <form action="{{ route('clientes.destroy', $cliente) }}" method="POST" class="d-inline" onsubmit="return confirm('Deseja excluir este cliente?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Excluir</button>
+                                        </form>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
