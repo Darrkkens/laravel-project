@@ -152,3 +152,27 @@ Senha: 123456
   - telefone e CEP em salas
 - Integracao ViaCEP para preenchimento automatico de endereco nas salas.
 
+- ## 📑 Checklist de Validação da Entrega (Requisitos A1/3)
+
+Abaixo estão listados os critérios obrigatórios solicitados para a aplicação e como eles foram cobertos no desenvolvimento:
+
+- [x] **Cadastro e login de usuários**
+  * *Implementação:* Controlado pelo `AuthController` com views dedicadas para autenticação e sessão segura.
+- [x] **Campo ou estrutura para identificar o perfil do usuário**
+  * *Implementação:* Adicionada a coluna `perfil` via banco de dados (Migration) e centralizado através da constante `PERFIS = ['admin', 'usuario']` dentro da Model `User`.
+- [x] **Pelo menos 2 perfis de acesso**
+  * *Implementação:* Definidos e validados os escopos para `admin` (Administrador) e `usuario` (Usuário Comum).
+- [x] **Proteção de rotas para impedir acesso não autorizado**
+  * *Implementação:* Bloqueio global feito pelo middleware nativo `auth` e restrição da área administrativa feita pelo middleware customizado `EnsureUserIsAdmin`.
+- [x] **Menu ou interface adaptada conforme o perfil logado**
+  * *Implementação:* Uso de diretivas Blade `@if (auth()->user()?->isAdmin())` para ocultar/exibir links de navegação e botões críticos de mutação (como *Editar* e *Excluir*).
+- [x] **Pelo menos 3 regras de autorização obrigatórias**
+  * *Regra 1:* Usuários não autenticados não acessam o sistema interno (Middleware `auth`).
+  * *Regra 2:* Apenas o perfil administrador pode visualizar e gerenciar a tela de usuários (`/usuarios`).
+  * *Regra 3:* Apenas o administrador possui permissão para alterar o `status` de uma reserva (regra aplicada e validada no método `update` do `ReservaController`).
+  * *Regra 4:* Apenas administradores podem deletar registros globais da aplicação.
+- [x] **Mensagens ou redirecionamentos adequados quando o usuário não tiver permissão**
+  * *Implementação:* Uso da função nativa `abort(403, 'Mensagem de erro...')` que renderiza automaticamente a view de erro de permissão negada do Laravel.
+- [x] **Atualização do README**
+  * *Implementação:* Documentação atualizada contendo instruções detalhadas de setup (Docker), credenciais dos usuários de teste, mapeamento dos perfis existentes e suas respectivas matrizes de permissão.
+
