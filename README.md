@@ -2,6 +2,9 @@
 
 Aplicacao Laravel para gerenciamento de clientes, salas e reservas.
 
+Trabalho A1/3.
+Grupo: Fernando Brandalise, Gabriel Likes , Victor Luckmann
+
 ## Requisitos
 
 - Docker Desktop (com Docker Compose)
